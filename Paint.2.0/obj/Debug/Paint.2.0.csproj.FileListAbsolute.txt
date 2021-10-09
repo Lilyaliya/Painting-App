@@ -1,0 +1,13 @@
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\bin\Debug\Paint.2.0.exe.config
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\bin\Debug\Paint.2.0.exe
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\bin\Debug\Paint.2.0.pdb
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint.2.0.csprojAssemblyReference.cache
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint._2._0.MainWindow.resources
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint._2._0.Properties.Resources.resources
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint.2.0.csproj.GenerateResource.cache
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint.2.0.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint.2.0.exe
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint.2.0.pdb
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\bin\Debug\FiguresLib.dll
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\bin\Debug\FiguresLib.pdb
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Paint.2.0\obj\Debug\Paint.2.0.csproj.CopyComplete

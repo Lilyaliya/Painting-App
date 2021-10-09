@@ -1,0 +1,2 @@
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Figures\obj\Debug\Figures.csprojAssemblyReference.cache
+C:\Users\Admin\Documents\3_SEMESTR\source\Paint.2.0\Figures\obj\Debug\Figures.csproj.CoreCompileInputs.cache
