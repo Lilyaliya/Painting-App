@@ -10,17 +10,21 @@ namespace FiguresLib {
     {
         private int x;
         private int x0, y0;
-        private Pen pen;
+        private const int width = 740;
+        private const int heigth = 572;
         public Square()
         {
-            pen = new Pen(Color.Green, 3);
+            Random rnd = new Random();
+            this.x = rnd.Next(2, width / 2);
+            Point p = new Point(rnd.Next(Math.Abs(width- x)),
+                                    rnd.Next(Math.Abs(heigth - x)));
+            this.x0 = p.X;
+            this.y0 = p.Y;
         }
 
         public Square(int x)
         {
             this.x = x;
-            if (pen == null)
-                pen = new Pen(Color.Green, 3);
         }
 
         public Square(int x0, int y0, int x)
@@ -28,13 +32,11 @@ namespace FiguresLib {
             this.x0 = x0;
             this.y0 = y0;
             this.x = x;
-            if (pen == null)
-                pen = new Pen(Color.Green, 3);
         }
 
         public void Show(Graphics gc, Color color, Point point)
         {
-            pen = new Pen(color, 3);
+            Pen pen = new Pen(color, 3);
             this.x0 = point.X;
             this.y0 = point.Y;
             gc.DrawRectangle(pen, point.X, point.Y, x, x);
@@ -42,6 +44,7 @@ namespace FiguresLib {
 
         public void Show(Graphics gc)
         {
+            Pen pen = new Pen(Color.Green, 3);
             gc.DrawRectangle(pen, x0, y0, x, x);
         }
 
@@ -55,7 +58,6 @@ namespace FiguresLib {
         {
             this.x0 += point.X;
             this.y0 += point.Y;
-            //gc.DrawRectangle(pen, point.X, point.Y, x, x);
         }
         ~Square() { }
         public int getLength() { return x; }

@@ -34,6 +34,9 @@ namespace Paint._2._0
             SetSize();
             this.MouseClick += new MouseEventHandler(mouseClick);
             graphics = canva.CreateGraphics();
+            Properties.Settings.Default.widthCanva = canva.Width;
+            Properties.Settings.Default.heigthCanva = canva.Height;
+            Properties.Settings.Default.Save();
             message.ForeColor = Color.FromArgb(255, 255, 255);
         }
 
@@ -434,36 +437,24 @@ namespace Paint._2._0
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Random rnd;
             switch (WhichReserved())
             {
                 case "square":
-                    rnd = new Random();
-                    int x = rnd.Next(2, canva.Width / 2);
-                    Point p = new Point(rnd.Next(Math.Abs(canva.Width - x)), 
-                                    rnd.Next(Math.Abs(canva.Height - x)));
-                    Square square = new Square(x);
+                    Square square = new Square();
                     squares = AddSquare(squares, square);
-                    squares[squares.Length - 1].Show(graphics, Color.Green, p);
+                    squares[squares.Length - 1].Show(graphics);
                     itemList.Items.Add(LastElement("square"));
                     break;
                 case "circle":
-                    rnd = new Random();
-                    int r = rnd.Next(2, canva.Width / 2);
-                    Point p2 = new Point(rnd.Next(Math.Abs(canva.Width - 2 * r)),
-                                    rnd.Next(Math.Abs(canva.Height - 2 * r)));
-                    circles = AddCircle(circles, new Circle(p2.X, p2.Y, r));
+                    Circle circle = new Circle();
+                    circles = AddCircle(circles, circle);
                     circles[circles.Length - 1].Show(graphics);
                     itemList.Items.Add(LastElement("circle"));
                     break;
                 case "rectangle":
-                    rnd = new Random();
-                    int a = rnd.Next(2, canva.Width / 2);
-                    int b = rnd.Next(3, canva.Height / 2);
-                    Point p3 = new Point(rnd.Next(Math.Abs(canva.Width - a)), 
-                                    rnd.Next(Math.Abs(canva.Height - b)));
-                    rectangles = AddRect(rectangles, new FiguresLib.Rectangle(a, b));
-                    rectangles[rectangles.Length - 1].Show(graphics, Color.Green, p3);
+                    FiguresLib.Rectangle rectangle = new FiguresLib.Rectangle();
+                    rectangles = AddRect(rectangles, rectangle);
+                    rectangles[rectangles.Length - 1].Show(graphics);
                     itemList.Items.Add(LastElement("rectangle"));
                     break;
                 case "none":
