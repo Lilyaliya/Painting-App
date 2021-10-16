@@ -23,8 +23,7 @@ namespace FiguresLib
             centre = new Point(rnd.Next(Math.Abs(width - R1)),
                                     rnd.Next(Math.Abs(width - R1)));
             R2 = R1 + 12;
-            inside = new Circle(centre, R1);
-            around = new Circle(centre, R2);
+            initCircles();
         }
 
         public Ring(Point centre, int r)
@@ -32,8 +31,7 @@ namespace FiguresLib
             this.centre = centre;
             this.R1 = r;
             this.R2 = R1 + 12;
-            inside = new Circle(centre, R1);
-            around = new Circle(centre, R2);
+            initCircles();
         }
 
         public void Show(Graphics gc)
@@ -56,6 +54,13 @@ namespace FiguresLib
             int y = centre.getY() + point.getY();
             centre.SetX(x);
             centre.SetY(y);
+            initCircles();
+        }
+
+        private void initCircles()
+        {
+            inside = new Circle(new Point(centre.getX() + 6, centre.getY() + 6), R1);
+            around = new Circle(centre, R2);
         }
 
         ~Ring() { }
