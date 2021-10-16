@@ -8,48 +8,51 @@ namespace FiguresLib
 {
     public class Circle
     {
-        private int x, y, r;
-        private const int width = 740;
-        private const int heigth = 572;
+        private int         r;
+        private Point       coords;
+        private const int   width = 740;
+        private const int   heigth = 572;
         public Circle()
         {
             Random rnd = new Random();
             this.r = rnd.Next(2, width / 2);
-            Point p2 = new Point(rnd.Next(Math.Abs(width - 2 * r)),
+            coords = new Point(rnd.Next(Math.Abs(width - 2 * r)),
                                     rnd.Next(Math.Abs(heigth - 2 * r)));
-            this.x = p2.X;
-            this.y = p2.Y;
             //generate randomly
         }
-        public Circle(int x, int y, int r)
+        public Circle(Point coords, int r)
         {
-            this.x = x;
-            this.y = y;
+            this.coords = coords;
             this.r = r;
         }
         public void Show(Graphics gc)
         {
             Pen pen = new Pen(Color.Green, 3);
-            gc.DrawEllipse(pen, this.x, this.y, r, r);
+            if (coords != null)
+                gc.DrawEllipse(pen, coords.getX(), coords.getY(), r, r);
         }
 
         public void Show(Graphics gc, Color color)
         {
             Pen pen1 = new Pen(color, 3);
-            gc.DrawEllipse(pen1, this.x, this.y, r, r);
+            if (coords != null)
+                gc.DrawEllipse(pen1, coords.getX(), coords.getY(), r, r);
         }
 
-        public void MoveTo(Graphics gc, Point point)
+        public void MoveTo(Point point)
         {
-            this.x += point.X;
-            this.y += point.Y;
+            int x = coords.getX() + point.getX();
+            int y = coords.getY() + point.getY();
+            coords.SetX(x);
+            coords.SetY(y);
         }
         ~Circle() { }
-        public int[] get() { return new int[] { x, y, r }; }
+        public Point getCoords() { return (coords); }
+
+        public int getRadius() => r;
         public void Set(int[] paramets)
         {
-            this.x = paramets[0];
-            this.y = paramets[1];
+            coords = new Point(paramets[0], paramets[1]);
             this.r = paramets[2];
         }
     }

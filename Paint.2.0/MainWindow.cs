@@ -13,20 +13,24 @@ namespace Paint._2._0
 {
     public partial class MainWindow : Form
     {
-        private object      currObj = null;
-        Graphics            graphics;
-        private Square[]    squares;
-        private FiguresLib.Rectangle[] rectangles;
-        private Circle[]    circles;
+        private object                  currObj = null;
+        Graphics                        graphics;
+        private Square[]                squares;      // массив квадратов
+        private FiguresLib.Rectangle[]  rectangles;  // массив прямоугольников
+        private Circle[]                circles;    // массив кругов
+        private Ring[]                  rings;     //массив колец
+        private House[]                 houses;   //массив домов
+        Object                          obj;     // Настоящий выделенный объект перемещения
+        int                             dX;     // дельта перемещения по X
+        int                             dY;    // дельта перемещения по Y
+        string objType = null;                // отдельная обработка перемещения для различных фигур
+        bool movingMode = false;
+        
         Pen pen = new Pen(Color.FromArgb(0, 255, 0), 3f);
         Bitmap bitmap = new Bitmap(500, 500);
         private bool isClicked = false;
         private bool inBounds = false;
-        Object obj; // Настоящий выделенный объект перемещения
-        string objType = null; // отдельная обработка перемещения для различных фигур
-        bool movingMode = false;
-        int dX;
-        int dY;
+        
         
         public MainWindow()
         {
@@ -93,6 +97,42 @@ namespace Paint._2._0
             }
         }
 
+        private Ring[] AddRing(Ring[] rings, Ring obj)
+        {
+            if (rings == null)
+            {
+                rings = new Ring[1];
+                rings[0] = obj;
+                return (rings);
+            }
+            else
+            {
+                Ring[] rings2 = new Ring[rings.Length + 1];
+                for (int i = 0; i < rings.Length; i++)
+                    rings2[i] = rings[i];
+                rings2[rings.Length] = obj;
+                return (rings2);
+            }
+        }
+
+        private House[] AddHouse(House[] houses, House obj)
+        {
+            if (houses == null)
+            {
+                houses = new House[1];
+                houses[0] = obj;
+                return (houses);
+            }
+            else
+            {
+                House[] houses2 = new House[houses.Length + 1];
+                for (int i = 0; i < houses.Length; i++)
+                    houses2[i] = houses[i];
+                houses2[houses.Length] = obj;
+                return (houses2);
+            }
+        }
+
         private Square[] RemoveSquare(Square[] squares, int index)
         {
             Square[] squares2 = new Square[squares.Length - 1];
@@ -123,6 +163,26 @@ namespace Paint._2._0
             for (int i = index; i < circles.Length - 1; i++)
                 circles2[i] = circles[i + 1];
             return (circles2);
+        }
+
+        private Ring[] RemoveRing(Ring[] rings, int index)
+        {
+            Ring[] rings2 = new Ring[rings.Length - 1];
+            for (int i = 0; i < index; i++)
+                rings2[i] = rings[i];
+            for (int i = index; i < rings.Length - 1; i++)
+                rings2[i] = rings[i + 1];
+            return (rings2);
+        }
+
+        private House[] RemoveHouse(House[] houses, int index)
+        {
+            House[] houses2 = new House[houses.Length - 1];
+            for (int i = 0; i < index; i++)
+                houses2[i] = houses[i];
+            for (int i = index; i < houses.Length - 1; i++)
+                houses2[i] = houses[i + 1];
+            return (houses2);
         }
 
         private void SetSize()
@@ -175,6 +235,12 @@ namespace Paint._2._0
                 case "circle":
                     message.Text = "КРУГ";
                     break;
+                case "ring":
+                    message.Text = "КОЛЬЦО";
+                    break;
+                case "house":
+                    message.Text = "ДОМ";
+                    break;
                 case "none":
                     message.Text = "none";
                     break;
@@ -207,6 +273,14 @@ namespace Paint._2._0
                     name = "ПРЯМОУГОЛЬНИК";
                     name += " №" + rectangles.Length;
                     break;
+                case "ring":
+                    name = "КОЛЬЦО";
+                    name += " №" + rings.Length;
+                    break;
+                case "house":
+                    name = "ДОМ";
+                    name += " №" + houses.Length;
+                    break;
             }
             return (name);
         }
@@ -219,6 +293,10 @@ namespace Paint._2._0
                 return ("rectangle");
             else if (circleControl.Tag.ToString() == "reserved")
                 return ("circle");
+            else if (ringControl.Tag.ToString() == "reserved")
+                return ("ring");
+            else if (houseControl.Tag.ToString() == "reserved")
+                return ("house");
             else
                 return ("none");
         }
@@ -253,6 +331,26 @@ namespace Paint._2._0
                             return (false);
                     }
                     break;
+                case "ring":
+                    foreach (char c in textBox1.Text)
+                    {
+                        if (!Char.IsDigit(c))
+                            return (false);
+                    }
+                    break;
+                case "house":
+                    foreach (char c in boxWidth.Text)
+                    {
+                        if (!Char.IsDigit(c))
+                            return (false);
+                    }
+                    foreach (char c in boxHeigth.Text)
+                    {
+                        if (!Char.IsDigit(c))
+                            return (false);
+                    }
+                    break;
+
             }
             return (true);
         }
@@ -296,6 +394,16 @@ namespace Paint._2._0
                     boxHeigth.Enabled = true;
                     boxHeigth.Visible = true;
                     break;
+                case "ring":
+                    textBox1.Visible = true;
+                    textBox1.Enabled = true;
+                    break;
+                case "house":
+                    boxWidth.Enabled = true;
+                    boxWidth.Visible = true;
+                    boxHeigth.Enabled = true;
+                    boxHeigth.Visible = true;
+                    break;
             }
         }
 
@@ -316,7 +424,7 @@ namespace Paint._2._0
             CheckSelected();
         }
 
-        private void CheckSelected()
+        private void CheckSelected() // только для квадратов
         {
             if (itemList.CheckedItems.Count > 1)
             {
@@ -332,7 +440,7 @@ namespace Paint._2._0
             }
         }
 
-        private void ChangeBtns(bool a, bool b)
+        private void ChangeBtns(bool a, bool b) // только для квадратов
         {
             trashBtn.Enabled = a;
             trashBtn.Visible = a;
@@ -384,6 +492,12 @@ namespace Paint._2._0
             if (circles != null)
                 foreach (var obj in circles)
                      obj.Show(graphics);
+            if (rings != null)
+                foreach (var obj in rings)
+                    obj.Show(graphics);
+            if (houses != null)
+                foreach (var obj in houses)
+                    obj.Show(graphics);
         }
 
         private void trashBtn_Click(object sender, EventArgs e)
@@ -405,6 +519,14 @@ namespace Paint._2._0
                 else if (el.ToString().Contains("ПРЯМОУГОЛЬНИК"))
                 {
                     rectangles = RemoveRectangle(rectangles, index);
+                }
+                else if (el.ToString().Contains("КОЛЬЦО"))
+                {
+                    rings = RemoveRing(rings, index);
+                }
+                else if (el.ToString().Contains("ДОМ"))
+                {
+                    houses = RemoveHouse(houses, index);
                 }
                 deleted[i] = itemList.Items.IndexOf(el);
                 renameFigures(el.ToString(), index);
@@ -457,6 +579,18 @@ namespace Paint._2._0
                     rectangles[rectangles.Length - 1].Show(graphics);
                     itemList.Items.Add(LastElement("rectangle"));
                     break;
+                case "ring":
+                    Ring ring = new Ring();
+                    rings = AddRing(rings, ring);
+                    rings[rings.Length - 1].Show(graphics);
+                    itemList.Items.Add(LastElement("ring"));
+                    break;
+                case "house":
+                    House house = new House();
+                    houses = AddHouse(houses, house);
+                    houses[houses.Length - 1].Show(graphics);
+                    itemList.Items.Add(LastElement("house"));
+                    break;
                 case "none":
                     message.Text = "ВЫБЕРИТЕ ТИП ФИГУРЫ";
                     timerMessage.Enabled = true;
@@ -471,10 +605,9 @@ namespace Paint._2._0
             switch (WhichReserved())
             {
                 case "square":
-                    Point p1 = new Point(e.X, e.Y);
                     if (onlyDigit("square"))
                     {
-                        squares = AddSquare(squares, new Square(p1.X, p1.Y, 
+                        squares = AddSquare(squares, new Square(new FiguresLib.Point(e.X, e.Y), 
                                         Convert.ToInt32(boxWidth.Text)));
                         squares[squares.Length - 1].Show(graphics);
                         itemList.Items.Add(LastElement("square"));
@@ -486,10 +619,9 @@ namespace Paint._2._0
                     }
                     break;
                 case "circle":
-                    Point p2 = new Point(e.X, e.Y);
                     if (onlyDigit("circle"))
                     {
-                        circles = AddCircle(circles, new Circle(p2.X, p2.Y, 
+                        circles = AddCircle(circles, new Circle(new FiguresLib.Point(e.X, e.Y), 
                                         Convert.ToInt32(textBox1.Text)));
                         circles[circles.Length - 1].Show(graphics);
                         itemList.Items.Add(LastElement("circle"));
@@ -501,13 +633,40 @@ namespace Paint._2._0
                     }
                     break;
                 case "rectangle":
-                    Point p3 = new Point(e.X, e.Y);
                     if (onlyDigit("rectangle"))
                     {
-                        rectangles = AddRect(rectangles, new FiguresLib.Rectangle(p3.X, p3.Y, 
+                        rectangles = AddRect(rectangles, new FiguresLib.Rectangle(new FiguresLib.Point(e.X, e.Y), 
                             Convert.ToInt32(boxWidth.Text), Convert.ToInt32(boxHeigth.Text)));
                         rectangles[rectangles.Length - 1].Show(graphics);
                         itemList.Items.Add(LastElement("rectangle"));
+                    }
+                    else
+                    {
+                        message.Text = "ВВЕДИТЕ КОРРЕКТНЫЕ ДАННЫЕ";
+                        timerMessage.Enabled = true;
+                    }
+                    break;
+                case "ring":
+                    if (onlyDigit("ring"))
+                    {
+                        rings = AddRing(rings, new Ring(new FiguresLib.Point(e.X, e.Y),
+                                        Convert.ToInt32(textBox1.Text)));
+                        rings[rings.Length - 1].Show(graphics);
+                        itemList.Items.Add(LastElement("ring"));
+                    }
+                    else
+                    {
+                        message.Text = "ВВЕДИТЕ КОРРЕКТНЫЕ ДАННЫЕ";
+                        timerMessage.Enabled = true;
+                    }
+                    break;
+                case "house":
+                    if (onlyDigit("house"))
+                    {
+                        houses = AddHouse(houses, new FiguresLib.House(new FiguresLib.Point(e.X, e.Y),
+                            Convert.ToInt32(boxWidth.Text), Convert.ToInt32(boxHeigth.Text)));
+                        houses[houses.Length - 1].Show(graphics);
+                        itemList.Items.Add(LastElement("house"));
                     }
                     else
                     {
@@ -563,6 +722,18 @@ namespace Paint._2._0
                         obj = rectangles[index - 1];
                         objType = "rectangle";
                     }
+                    else if (el.ToString().Contains("КОЛЬЦО"))
+                    {
+                        rings[index - 1].Show(graphics, Color.Red);
+                        obj = rings[index - 1];
+                        objType = "ring";
+                    }
+                    else if (el.ToString().Contains("ДОМ"))
+                    {
+                        houses[index - 1].Show(graphics, Color.Red);
+                        obj = houses[index - 1];
+                        objType = "house";
+                    }    
                 }
             }
             else if (moveBtn.Tag.ToString() == "pressed")
@@ -588,11 +759,11 @@ namespace Paint._2._0
             if (objType == "circle")
             {
                 Circle circle = (Circle)obj;
-                int x = circle.get()[0];
-                int y = circle.get()[1];
-                int r = circle.get()[2];
+                int x = circle.getCoords().getX();
+                int y = circle.getCoords().getY();
+                int r = circle.getRadius();
                 if (e.X > x - r && e.Y > y - r && e.X < x + r && e.Y < y + r)
-                { 
+                {
                     inBounds = true;
                     dX = e.X - x;
                     dY = e.Y - y;
@@ -601,21 +772,21 @@ namespace Paint._2._0
             else if (objType == "square")
             {
                 Square square = (Square)obj;
-                int x0 = square.getCoords()[0];
-                int y0 = square.getCoords()[1];
+                int x0 = square.getCoords().getX();
+                int y0 = square.getCoords().getY();
                 int x = square.getLength();
                 if ((e.X < x0 + x) && (e.X > x0) && (e.Y < y0 + x) && (e.Y > y0))
                 {
-                    inBounds = true; 
+                    inBounds = true;
                     dX = e.X - x0;
                     dY = e.Y - y0;
                 }
             }
-            else
+            else if (objType == "rectangle")
             {
                 FiguresLib.Rectangle rectangle = (FiguresLib.Rectangle)obj;
-                int x0 = rectangle.getCoords()[0];
-                int y0 = rectangle.getCoords()[1];
+                int x0 = rectangle.getCoords().getX();
+                int y0 = rectangle.getCoords().getY();
                 int x = rectangle.getSize()[0];
                 int y = rectangle.getSize()[1];
                 if ((e.X < x0 + x) && (e.X > x0) && (e.Y < y0 + y) && (e.Y > y0))
@@ -625,8 +796,50 @@ namespace Paint._2._0
                     dY = e.Y - y0;
                 }
             }
+            else if (objType == "ring")
+            {
+                Ring ring = (Ring)obj;
+                FiguresLib.Point coords = ring.getCoords();
+                int R2 = ring.getRadius2();
+                if (e.X > coords.getX() - R2 && e.Y > coords.getY() - R2 
+                            && e.X < coords.getX() + R2 && e.Y < coords.getY() + R2)
+                {
+                    inBounds = true;
+                    dX = e.X - coords.getX();
+                    dY = e.Y - coords.getY();
+                }
+            }
+            else if (objType == "house")
+            {
+                House house = (House)obj;
+                FiguresLib.Point centre = house.getCoords();
+                FiguresLib.Point highPoint = house.getHigh();
+                int x = house.getSize()[0];
+                int y = house.getSize()[1];
+                if ((e.X < centre.getX() + x) && (e.X > centre.getX())
+                                              && (e.Y < centre.getY() + y) && (e.Y > centre.getY())
+                                              || checkTriangle(centre, highPoint, 
+                                                    new FiguresLib.Point(centre.getX() + x, centre.getY()), 
+                                                    new FiguresLib.Point(e.X, e.Y)))
+                {
+                    inBounds = true;
+                    dX = e.X - centre.getX();
+                    dY = e.Y - centre.getY();
+                }
+            }
         }
 
+        private bool checkTriangle(FiguresLib.Point p1, FiguresLib.Point p2, 
+                                    FiguresLib.Point p3, FiguresLib.Point p)
+        {
+            int m1 = (p1.getX() - p.getX()) * (p2.getY() - p1.getY()) - (p2.getX() - p1.getX()) * (p1.getY() - p.getY());
+            int m2 = (p2.getX() - p.getX()) * (p3.getY() - p2.getY()) - (p3.getX() - p2.getX()) * (p2.getY() - p.getY());
+            int m3 = (p3.getX() - p.getX()) * (p1.getY() - p3.getY()) - (p1.getX() - p3.getX()) * (p3.getY() - p.getY());
+            if ((m1 > 0 && m2 > 0 && m3 > 0) || (m1 < 0 && m2 < 0 && m3 < 0))
+                return (true);
+            else
+                return (false);
+        }
         private void canva_MouseUp(object sender, MouseEventArgs e)
         {
             isClicked = false;
@@ -642,20 +855,32 @@ namespace Paint._2._0
                     case "square":
                         Square square = (Square)obj;
                         Square currentS = squares.First<Square>(x => x == square);
-                        currentS.MoveTo(graphics, new Point(-currentS.getCoords()[0] + e.X - dX, 
-                            -currentS.getCoords()[1] + e.Y - dY));
+                        currentS.MoveTo(new FiguresLib.Point(-currentS.getCoords().getX() + e.X - dX, 
+                            -currentS.getCoords().getY() + e.Y - dY));
                         break;
                     case "circle":
                         Circle circle = (Circle)obj;
                         Circle currentC = circles.First<Circle>(x => x == circle);
-                        currentC.MoveTo(graphics, new Point(-currentC.get()[0] + e.X - dX,
-                            -currentC.get()[1] + e.Y - dY));
+                        currentC.MoveTo(new FiguresLib.Point(-currentC.getCoords().getX() + e.X - dX,
+                            -currentC.getCoords().getY() + e.Y - dY));
                         break;
                     case "rectangle":
                         FiguresLib.Rectangle rectangle = (FiguresLib.Rectangle)obj;
                         FiguresLib.Rectangle currentR = rectangles.First<FiguresLib.Rectangle>(x => x == rectangle);
-                        currentR.MoveTo(graphics, new Point(-currentR.getCoords()[0] + e.X - dX,
-                            -currentR.getCoords()[1] + e.Y - dY));
+                        currentR.MoveTo(new FiguresLib.Point(-currentR.getCoords().getX() + e.X - dX,
+                            -currentR.getCoords().getY() + e.Y - dY));
+                        break;
+                    case "ring":
+                        Ring ring = (Ring)obj;
+                        Ring currentRing = rings.First<Ring>(x => x == ring);
+                        currentRing.MoveTo(new FiguresLib.Point(-currentRing.getCoords().getX() + e.X - dX,
+                            -currentRing.getCoords().getY() + e.Y - dY));
+                        break;
+                    case "house":
+                        House house = (House)obj;
+                        House currentH = houses.First<House>(x => x == house);
+                        currentH.MoveTo(new FiguresLib.Point(-currentH.getCoords().getX() + e.X - dX,
+                            -currentH.getCoords().getY() + e.Y - dY));
                         break;
                 }
                 reDraw();
