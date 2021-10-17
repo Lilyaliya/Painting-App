@@ -14,6 +14,12 @@ namespace FiguresLib
         {
             this.X = X;
             this.Y = Y;
+            new Point();
+        }
+
+        public Point()
+        {
+            Console.WriteLine("Создана точка");
         }
 
         public int getX() => this.X;
